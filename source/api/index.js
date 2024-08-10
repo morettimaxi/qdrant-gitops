@@ -103,20 +103,30 @@ app.post('/configure', authenticateToken, async (req, res) => {
 app.get('/token/:client', authenticateToken, async (req, res) => {
     const { client } = req.params;
 
+    // Check if the user has the necessary permissions
     if (req.user.scope !== client && req.user.scope !== 'admin') {
         return res.status(403).json({ error: 'Insufficient permissions' });
     }
 
     try {
-        const secret = await k8sApi.readNamespacedSecret(`${client}-secret`, 'saas-app');
+        // Construct the secret name and namespace dynamically
+        const secretName = `qdrant-${client}-apikey`;
+        const namespace = `qdrant-${client}`;
+
+        // Fetch the secret from Kubernetes
+        const secret = await k8sApi.readNamespacedSecret(secretName, namespace);
+
+        // Decode the token from the secret
         const token = Buffer.from(secret.body.data.token, 'base64').toString();
         
+        // Send the token in the response
         res.send({ token });
     } catch (error) {
         console.error(error);
         res.status(500).send({ error: 'Failed to retrieve token' });
     }
 });
+
 
 app.listen(8081, () => {
     console.log('API server running on port 8081');
