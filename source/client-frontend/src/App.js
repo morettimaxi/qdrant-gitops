@@ -12,7 +12,7 @@ function App() {
     const [snapshotSize, setSnapshotSize] = useState('15Gi');
 
     const handleLogin = async () => {
-        const response = await fetch('http://localhost:8081/login', {
+        const response = await fetch('http://api.local/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ function App() {
         
         const token = localStorage.getItem('token');
 
-        const response = await fetch('http://localhost:8081/configure', {
+        const response = await fetch('http://api.local/configure', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

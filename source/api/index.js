@@ -6,7 +6,7 @@ const k8s = require('@kubernetes/client-node');
 const { Octokit } = require("@octokit/rest");
 
 const app = express();
-const SECRET_KEY = 'test1234'; // Use a strong secret key for JWT
+const SECRET_KEY = 'test1234'; // TODO auto rotation using vault or other secret manager
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -15,7 +15,7 @@ const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
 const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
 
-const users = {
+const users = { //TODO use auth0 or other auth service
     client1: { password: 'client1', scope: 'client1' },
     client2: { password: 'client2', scope: 'client2' },
     admin: { password: 'admin', scope: 'admin' }  // Admin user with all access
@@ -23,7 +23,10 @@ const users = {
 
 // Function to initialize Octokit with the GitHub token
 async function getOctokit() {
-    const token = ""; // Replace with your actual GitHub token
+    const token = process.env.GITHUB_TOKEN; // Read the token from the environment variable
+    if (!token) {
+        throw new Error("GitHub token is not set in the environment variables.");
+    }
     return new Octokit({ auth: token });
 }
 
@@ -71,17 +74,17 @@ app.post('/configure', authenticateToken, async (req, res) => {
         const { data: { content, sha } } = await octokit.repos.getContent({
             owner: 'morettimaxi',
             repo: 'qdrant-gitops',
-            path: `argo-cd/clients/overlays/${client}/values.yaml`,
+            path: `argo-cd/clients/helm/${client}/values.yaml`,
             ref: 'master'
         });
 
         let valuesContent = Buffer.from(content, 'base64').toString();
-        valuesContent = valuesContent.replace(/replicas:.*/, `replicas: ${replicas}`);
+        valuesContent = valuesContent.replace(/replicaCount:.*/, `replicaCount: ${replicas}`);
 
         await octokit.repos.createOrUpdateFileContents({
             owner: 'morettimaxi',
             repo: 'qdrant-gitops',
-            path: `argo-cd/clients/overlays/${client}/values.yaml`,
+            path: `argo-cd/clients/helm/${client}/values.yaml`,
             message: `Update replicas for ${client}`,
             content: Buffer.from(valuesContent).toString('base64'),
             sha,
