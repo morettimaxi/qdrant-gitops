@@ -6,23 +6,22 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/morettimaxi/qdrant-gitops.git'
+    repoURL: https://github.com/morettimaxi/qdrant-gitops.git
+    path: argo-cd/clients/helm
     targetRevision: master
-    path: argo-cd/clients/client1
+    helm:
+      valueFiles:
+        - client1/values.yaml
   destination:
-    server: 'https://kubernetes.default.svc'
+    server: https://kubernetes.default.svc
     namespace: qdrant-client1
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
-  ignoreDifferences:
-    - group: apps
-      kind: Deployment
-      jsonPointers:
-        - /spec/replicas
+      - CreateNamespace=true  # Add this line to create the namespace automatically
+
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -32,21 +31,18 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/morettimaxi/qdrant-gitops.git'
+    repoURL: https://github.com/morettimaxi/qdrant-gitops.git
+    path: argo-cd/clients/helm
     targetRevision: master
-    path: argo-cd/clients/client1
+    helm:
+      valueFiles:
+        - client2/values.yaml
   destination:
-    server: 'https://kubernetes.default.svc'
+    server: https://kubernetes.default.svc
     namespace: qdrant-client2
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
-  ignoreDifferences:
-    - group: apps
-      kind: Deployment
-      jsonPointers:
-        - /spec/replicas
-
+      - CreateNamespace=true  # Add this line to create the namespace automatically
