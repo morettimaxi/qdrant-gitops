@@ -1,0 +1,52 @@
+.App {
+  font-family: Arial, sans-serif;
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #220991;
+  color: white;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #ec2c54;
+}
+
+form div {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+input, select {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  color: #220991;
+}
+
+button {
+  padding: 10px 15px;
+  background-color: #ec2c54;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #c02044;
+}
+
+.logo {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
