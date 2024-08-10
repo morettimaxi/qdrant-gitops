@@ -1,5 +1,6 @@
 persistence:
-  size: 20Gi
+  size: 15Gi
 snapshotPersistence:
-  enabled: true
-  size: 20Gi
+  enabled: false
+  size: 15Gi
+replicas: 2
