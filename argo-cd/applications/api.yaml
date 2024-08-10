@@ -16,7 +16,7 @@ spec:
       serviceAccountName: api-service-account
       containers:
         - name: api
-          image: your-docker-repo/api:latest
+          image: node:14
           ports:
             - containerPort: 3000
 ---
