@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: nginx:1.19
+          image: morettimaxi/poc-front:tagname
           ports:
             - containerPort: 80
 ---

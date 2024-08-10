@@ -26,4 +26,4 @@ spec:
               service:
                 name: api
                 port:
-                  number: 3000
+                  number: 8081
