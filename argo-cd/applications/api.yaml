@@ -16,7 +16,7 @@ spec:
       serviceAccountName: api-service-account
       containers:
         - name: api
-          image: morettimaxi/poc-api:v2
+          image: morettimaxi/poc-api:v3
           ports:
             - containerPort: 8081
           env:
