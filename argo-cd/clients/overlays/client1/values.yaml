@@ -3,4 +3,4 @@ persistence:
 snapshotPersistence:
   enabled: false
   size: 15Gi
-replicas: 2
+replicas: 4
