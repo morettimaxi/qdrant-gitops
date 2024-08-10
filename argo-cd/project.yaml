@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/your-org/saas-poc'
+    repoURL: 'https://github.com/morettimaxi/qdrant-gitops'
     targetRevision: HEAD
     path: argo-cd/applications
   destination:
