@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: morettimaxi/poc-front:tagname
+          image: morettimaxi/poc-front:v1
           ports:
             - containerPort: 80
 ---
