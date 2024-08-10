@@ -1,6 +1,1 @@
-persistence:
-  size: 15Gi
-snapshotPersistence:
-  enabled: false
-  size: 15Gi
-replicas: 3
+replicaCount: 3
