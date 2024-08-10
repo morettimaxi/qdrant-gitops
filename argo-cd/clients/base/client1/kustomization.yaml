@@ -1,0 +1,6 @@
+resources:
+  - ../../base
+configMapGenerator:
+  - name: client1-config
+    files:
+      - values.yaml

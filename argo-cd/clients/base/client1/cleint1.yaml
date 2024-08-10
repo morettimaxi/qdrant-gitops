@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: qdrant-client1
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://qdrant.github.io/qdrant-helm  # This is the Qdrant Helm repo you added
+    chart: qdrant
+    targetRevision: latest  # You can specify a specific version or use 'latest'
+    helm:
+      valueFiles:
+        - mvalues.yaml  # Reference to your custom values file
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: qdrant-client1  # Set the namespace where you want to deploy Qdrant
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
