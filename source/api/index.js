@@ -30,6 +30,11 @@ async function getOctokit() {
     return new Octokit({ auth: token });
 }
 
+// Health check endpoint
+app.get('/healthz', (req, res) => {
+    res.status(200).send('OK');
+});
+
 // Login endpoint to authenticate users and issue JWT token
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
@@ -103,30 +108,31 @@ app.post('/configure', authenticateToken, async (req, res) => {
 app.get('/token/:client', authenticateToken, async (req, res) => {
     const { client } = req.params;
 
-    // Check if the user has the necessary permissions
     if (req.user.scope !== client && req.user.scope !== 'admin') {
         return res.status(403).json({ error: 'Insufficient permissions' });
     }
 
     try {
-        // Construct the secret name and namespace dynamically
         const secretName = `qdrant-${client}-apikey`;
         const namespace = `qdrant-${client}`;
 
         // Fetch the secret from Kubernetes
         const secret = await k8sApi.readNamespacedSecret(secretName, namespace);
 
-        // Decode the token from the secret
-        const token = Buffer.from(secret.body.data.token, 'base64').toString();
-        
-        // Send the token in the response
-        res.send({ token });
+        // Check if the api-key field exists in the secret's data
+        if (!secret.body.data || !secret.body.data['api-key']) {
+            return res.status(500).send({ error: 'API key not found in secret' });
+        }
+
+        // Decode the api-key from base64
+        const apiKey = Buffer.from(secret.body.data['api-key'], 'base64').toString();
+
+        res.send({ token: apiKey });
     } catch (error) {
         console.error(error);
         res.status(500).send({ error: 'Failed to retrieve token' });
     }
 });
-
 
 app.listen(8081, () => {
     console.log('API server running on port 8081');

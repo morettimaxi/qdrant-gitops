@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: api
   namespace: saas-app
+  labels:
+    app: api
 spec:
   replicas: 1
   selector:
@@ -16,7 +18,7 @@ spec:
       serviceAccountName: api-service-account
       containers:
         - name: api
-          image: morettimaxi/poc-api:v3
+          image: morettimaxi/poc-api:v4
           ports:
             - containerPort: 8081
           env:
@@ -25,6 +27,38 @@ spec:
                 secretKeyRef:
                   name: github-token
                   key: github-token
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            failureThreshold: 30
+            periodSeconds: 10
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 3000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
 ---
 apiVersion: v1
 kind: Service
@@ -36,5 +70,36 @@ spec:
     app: api
   ports:
     - protocol: TCP
-      port: 8081
+      port: 80
       targetPort: 8081
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-hpa
+  namespace: saas-app
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api-pdb
+  namespace: saas-app
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: api
