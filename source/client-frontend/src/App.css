@@ -1,27 +1,75 @@
-.logo {
-  width: 200px; /* Adjust as needed */
-  margin-bottom: 20px; /* Adds space between the logo and the form elements */
-}
-
-.login-form {
+.App {
+  font-family: 'Arial', sans-serif;
+  max-width: 500px;
+  margin: 100px auto;
+  padding: 40px;
+  border-radius: 15px;
+  background-color: #220991;
+  color: white;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
   text-align: center;
 }
 
-.spaced {
-  margin-top: 30px; /* Adjust this value for more or less space */
+h1, h2 {
+  font-size: 32px;
+  margin-bottom: 30px;
+  color: #ec2c54;
 }
 
-.credentials-section button {
-  margin-bottom: 20px; /* Adjust for more space between button and token display */
+form div {
+  margin-bottom: 25px;
 }
 
-.token-display {
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #ec2c54;
+  font-size: 20px;
 }
 
-.token-display input {
-  flex: 1;
-  margin-right: 10px;
+input, select {
+  width: 100%;
+  padding: 12px;
+  font-size: 20px;
+  color: #220991;
+  background-color: white;
+  border: 2px solid #ec2c54;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 15px 30px;
+  font-size: 20px;
+  background-color: #ec2c54;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #c02044;
+}
+
+.logo {
+  max-width: 100px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.login-form {
+  background-color: #220991;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.config-form {
+  background-color: #220991;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
 }
