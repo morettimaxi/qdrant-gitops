@@ -1,0 +1,11 @@
+resources:
+  - ../../base
+
+patchesStrategicMerge:
+  - api-deployment-patch.yaml
+  - frontend-deployment-patch.yaml
+
+namespace: saas-app
+
+commonLabels:
+  environment: prod

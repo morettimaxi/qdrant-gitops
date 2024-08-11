@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: saas-poc-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/morettimaxi/qdrant-gitops'
+    targetRevision: HEAD
+    path: argo-cd/applications/kustomize/overlays/prod
+    kustomize:
+      namePrefix: prod-
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: saas-app
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
