@@ -14,6 +14,7 @@ spec:
       labels:
         app: api
     spec:
+      serviceAccountName: api-service-account  # Attach the service account here
       containers:
         - name: api
           image: morettimaxi/poc-api:v3
