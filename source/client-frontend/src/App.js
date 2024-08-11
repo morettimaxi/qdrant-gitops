@@ -10,6 +10,9 @@ function App() {
     const [replicas, setReplicas] = useState(1);
     const [persistenceSize, setPersistenceSize] = useState('15Gi');
     const [snapshotSize, setSnapshotSize] = useState('15Gi');
+    const [credentialsToken, setCredentialsToken] = useState('');
+    const [showToken, setShowToken] = useState(false);
+    const [url, setUrl] = useState('');
 
     const handleLogin = async () => {
         const response = await fetch('http://api.local/login', {
@@ -51,6 +54,30 @@ function App() {
             alert(data.status);
         } else {
             alert('Failed to update replicas');
+        }
+    };
+
+    const handleGetCredentials = async () => {
+        const token = localStorage.getItem('token');
+        
+        try {
+            const response = await fetch(`http://api.local/token/${client}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                setCredentialsToken(data.token);
+                setUrl(`${client}.qdrant.local`);
+            } else {
+                alert('Failed to get credentials');
+            }
+        } catch (error) {
+            console.error('Error getting credentials:', error);
+            alert('Error getting credentials');
         }
     };
 
@@ -112,6 +139,25 @@ function App() {
                         </div>
                         <button type="submit">Submit</button>
                     </form>
+                    <div className="credentials-section spaced">
+                        <button onClick={handleGetCredentials}>Get Credentials and URL</button>
+                        {credentialsToken && (
+                            <div className="credentials-display">
+                                <p>URL: {url}</p>
+                                <div className="token-display">
+                                    <input 
+                                        type={showToken ? 'text' : 'password'} 
+                                        value={credentialsToken} 
+                                        readOnly 
+                                    />
+                                    <button onClick={() => setShowToken(!showToken)}>
+                                        {showToken ? 'Hide Token' : 'Show Token'}
+                                    </button>
+                                    <button onClick={() => navigator.clipboard.writeText(credentialsToken)}>Copy Token</button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: qdrant-client1
+  namespace: qdrant-client1
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: client1.qdrant.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: qdrant-client1
+                port:
+                  number: 6333
