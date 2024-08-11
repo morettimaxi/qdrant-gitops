@@ -73,7 +73,7 @@ spec:
       port: 80
       targetPort: 8081
 ---
-apiVersion: autoscaling/v2
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: api-hpa
@@ -85,13 +85,8 @@ spec:
     name: api
   minReplicas: 1
   maxReplicas: 3
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 80
+  targetCPUUtilizationPercentage: 80
+
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
