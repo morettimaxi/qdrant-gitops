@@ -44,13 +44,6 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "200m"
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 3000
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
