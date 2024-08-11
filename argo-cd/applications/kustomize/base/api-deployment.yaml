@@ -56,8 +56,8 @@ spec:
             - name: GITHUB_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: github_token
-                  key: github_token
+                  name: github-token
+                  key: github-token
                 
 
 ---
