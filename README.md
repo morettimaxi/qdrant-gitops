@@ -182,35 +182,8 @@ app.get('/token/:client', authenticateToken, async (req, res) => {
 
 The API requires specific permissions to access secrets in Kubernetes. This is achieved through RBAC (Role-Based Access Control) settings:
 
-'''yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: api-service-account
-  namespace: saas-app
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: api-read-secrets-cluster-role
-rules:
-  - apiGroups: [""]
-    resources: ["secrets"]
-    verbs: ["get", "list", "watch"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: api-read-secrets-cluster-role-binding
-subjects:
-  - kind: ServiceAccount
-    name: api-service-account
-    namespace: saas-app
-roleRef:
-  kind: ClusterRole
-  name: api-read-secrets-cluster-role
-  apiGroup: rbac.authorization.k8s.io
-'''
+  - [Rbac config](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/applications/kustomize/base/rbac.yaml)
+  - [API deployment SA](https://github.com/morettimaxi/qdrant-gitops/blob/cecf4937bf7952655166b71b1fee7b711735bc57/argo-cd/applications/kustomize/base/api-deployment.yaml#L17)
 
 **Explanation**:
 - **ServiceAccount**: The `api-service-account` is created in the `saas-app` namespace. This service account is used by the API to interact with Kubernetes.
