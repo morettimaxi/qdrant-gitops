@@ -1,19 +1,24 @@
+
 # Qdrant GitOps SaaS DB Management PoC
 
 ## Introduction
 
 The objective of this repository is to create a SaaS Database Management Proof of Concept (PoC) for Qdrant databases. This solution is designed to allow multiple clients to manage their Qdrant instances through a well-integrated system comprising a frontend interface, an API, and a GitOps workflow using Argo CD.
 
+Additionally, the solution includes two authentication mechanisms: JWT and OpenID. The frontend is configured to work with both methods, offering flexibility based on different authentication requirements.
+
 ### How It Works
 
 ![JWT Flow](images/qdraw-flow.png)
 
-
 This solution employs a three-tier architecture that is meticulously designed to ensure scalability, security, and automation:
 
-- **Frontend**: Provides a user-friendly interface where clients can log in, configure their Qdrant instances, and monitor status updates. The frontend is responsible for interacting with the user and securely transmitting data to the API.
+- **Frontend**: Provides a user-friendly interface where clients can log in, configure their Qdrant instances, and monitor status updates. The frontend is responsible for interacting with the user and securely transmitting data to the API. The frontend is built using [React](https://reactjs.org/).
+  - [Frontend Code (JWT)](https://github.com/morettimaxi/qdrant-gitops/tree/master/source/client-frontend)
+  - [Frontend Code (OpenID with Auth0)](https://github.com/morettimaxi/qdrant-gitops/tree/master/source/client-frontend-auth)
   
-- **API**: Serves as the intermediary between the frontend and backend systems. It is responsible for validating user credentials, generating and validating JWT tokens, processing client requests, and committing the necessary configuration changes to a Git repository. This layer ensures that all client interactions are secure and authorized.
+- **API**: Serves as the intermediary between the frontend and backend systems. It is responsible for validating user credentials, generating and validating JWT tokens, processing client requests, and committing the necessary configuration changes to a Git repository. The API is built using [Node.js](https://nodejs.org/) and [Express](https://expressjs.com/).
+  - [API Code](https://github.com/morettimaxi/qdrant-gitops/tree/master/source/api)
 
 - **GitOps (Argo CD)**: Continuously monitors the Git repository for changes and automatically deploys updates to the Qdrant instances. Argo CD ensures that the desired state of the infrastructure, as defined in the Git repository, is maintained consistently across all environments.
 
@@ -53,7 +58,6 @@ The deployment strategy leverages Kustomize and Argo CD to manage environment-sp
 - **Override and Kustomize Configuration**: The environment-specific settings and overrides are managed using Kustomize.
   - [Kustomize Overrides](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/applications/kustomize/overlays/prod/kustomization.yaml)
 
-
 ### Managing Qdrant Helm Charts with Argo CD
 
 Argo CD is also used to manage the Helm charts for each client's Qdrant instance. The Helm charts are configured to deploy client-specific Qdrant instances with environment-specific values.
@@ -73,10 +77,6 @@ Argo CD continuously monitors the Git repository for any changes to these `value
 For further details, refer to the Argo CD application configuration used to manage these deployments:
 - [Argo CD Client Configuration](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/clients.yaml)
 
-
-- **Override and Kustomize Configuration**: The environment-specific settings and overrides are managed using Kustomize.
-  - [Kustomize Overrides](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/applications/kustomize/overlays/prod/kustomization.yaml)
-
 ### Kubernetes Features
 
 The Kubernetes deployments are configured with several advanced features to ensure high availability, resilience, and optimal resource utilization:
@@ -87,16 +87,8 @@ The Kubernetes deployments are configured with several advanced features to ensu
 - **Pod Disruption Budget (PDB)**: Ensures that a minimum number of pods are always available during maintenance or updates.
 
 These features enhance the reliability and efficiency of the deployments, ensuring that the system remains responsive and available under all conditions.
-
-### Managing Qdrant Helm Charts with Argo CD
-
-Argo CD is also used to manage the Helm charts for each client's Qdrant instance. The Helm charts are configured to deploy client-specific Qdrant instances with environment-specific values.
-
-- **Helm Chart Management**:
-  - [Helm Chart Configuration](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/clients.yaml)
-
-- **API Updates**: The API interacts with the Helm charts by updating the `values.yaml` files specific to each client. These updates are then automatically deployed by Argo CD.
-  - [Client-specific Helm Values](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/clients/helm/client1/values.yaml)
+  - [Kubernetes files](https://github.com/morettimaxi/qdrant-gitops/tree/master/argo-cd/applications/kustomize)
+  - [Kubernetes Override](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/applications/kustomize/overlays/prod/kustomization.yaml)
 
 ### RBAC and API Security
 
@@ -120,7 +112,7 @@ The solution also supports OpenID and Auth0 as alternative authentication mechan
 The Terraform scripts in this repository are responsible for setting up the foundational infrastructure, including Argo CD, Kong, and NGINX Ingress. These scripts ensure that the environment is consistently configured and ready for application deployment.
 
 - **Terraform Configuration**:
-  - [Terraform Main Configuration](https://github.com/morettimaxi/qdrant-gitops/blob/fe4e21ae102843c49531c8c8e2a8403ad50c8dcc/terraform/main.tf)
+  - [Terraform Main Configuration](https://github.com/morettimaxi/qdrant-gitops/tree/master/terraform)
 
 ### Dockerfile and Features
 
@@ -131,7 +123,8 @@ The Dockerfile is designed to ensure security, efficiency, and scalability. It i
 - **Security Considerations**: The Dockerfile is configured to minimize the attack surface by including only essential components and applying security best practices.
 
 - **Dockerfile Configuration**:
-  - [Dockerfile](https://github.com/morettimaxi/qdrant-gitops/blob/fe4e21ae102843c49531c8c8e2a8403ad50c8dcc/source/docker/Dockerfile)
+  - [API Dockerfile](https://github.com/morettimaxi/qdrant-gitops/blob/master/source/api/Dockerfile)
+  - [Frontend Dockerfile](https://github.com/morettimaxi/qdrant-gitops/blob/master/source/client-frontend/Dockerfile)
 
 - **Version Management with Argo CD**: Argo CD manages the deployment versions by overriding configurations based on the Docker image tags, ensuring that updates are automatically applied without manual intervention.
 
@@ -149,4 +142,4 @@ The Dockerfile is designed to ensure security, efficiency, and scalability. It i
 ### Pending Tasks
 
 1. **Terraform Backend**: Create a backend in S3 or another cloud bucket to store the Terraform state.
-2. **JWT Signing Key Management**: Use Vault to manage JWT signing keys, implementing automatic key rotation. Ensure
+2. **JWT Signing Key Management**: Use Vault to manage JWT signing keys, implementing automatic key rotation. Ensure that old keys remain visible during rotation to avoid issues.
