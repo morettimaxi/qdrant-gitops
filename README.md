@@ -128,6 +128,97 @@ Refer to the diagram (attached separately) that visually represents the interact
 ![Auth0 Flow](images/auth0-flow.png)
 
 
+### K8s RBAC Permissions and API
+
+The application uses Kubernetes Role-Based Access Control (RBAC) permissions to securely manage access to secrets, particularly for retrieving API keys for Qdrant instances. This setup ensures that only authorized users can retrieve sensitive information such as API keys.
+
+#### How the API Retrieves Secrets
+
+The API includes an endpoint `GET /token/:client` which allows authorized users to retrieve the API key for a specific Qdrant client. Here's a breakdown of how it works:
+
+\`\`\`javascript
+app.get('/token/:client', authenticateToken, async (req, res) => {
+    const { client } = req.params;
+
+    if (req.user.scope !== client && req.user.scope !== 'admin') {
+        return res.status(403).json({ error: 'Insufficient permissions' });
+    }
+
+    try {
+        const secretName = `qdrant-${client}-apikey`;
+        const namespace = `qdrant-${client}`;
+
+        // Fetch the secret from Kubernetes
+        const secret = await k8sApi.readNamespacedSecret(secretName, namespace);
+
+        // Check if the api-key field exists in the secret's data
+        if (!secret.body.data || !secret.body.data['api-key']) {
+            return res.status(500).send({ error: 'API key not found in secret' });
+        }
+
+        // Decode the api-key from base64
+        const apiKey = Buffer.from(secret.body.data['api-key'], 'base64').toString();
+
+        res.send({ token: apiKey });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ error: 'Failed to retrieve token' });
+    }
+});
+\`\`\`
+
+**Explanation**:
+- The API first checks if the user has the necessary permissions (i.e., their `scope` matches the `client` or they are an admin).
+- The API then fetches the secret from the Kubernetes cluster using the Kubernetes API.
+- The secret is retrieved from a specific namespace (`qdrant-{client}`) and is expected to contain the API key.
+- The API key is decoded from base64 and returned to the user.
+
+#### Kubernetes RBAC Configuration
+
+The API requires specific permissions to access secrets in Kubernetes. This is achieved through RBAC (Role-Based Access Control) settings:
+
+\`\`\`yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: api-service-account
+  namespace: saas-app
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: api-read-secrets-cluster-role
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: api-read-secrets-cluster-role-binding
+subjects:
+  - kind: ServiceAccount
+    name: api-service-account
+    namespace: saas-app
+roleRef:
+  kind: ClusterRole
+  name: api-read-secrets-cluster-role
+  apiGroup: rbac.authorization.k8s.io
+\`\`\`
+
+**Explanation**:
+- **ServiceAccount**: The `api-service-account` is created in the `saas-app` namespace. This service account is used by the API to interact with Kubernetes.
+- **ClusterRole**: The `api-read-secrets-cluster-role` defines the permissions that allow the API to read secrets within the cluster.
+- **ClusterRoleBinding**: The `api-read-secrets-cluster-role-binding` binds the `ClusterRole` to the `ServiceAccount`, granting it the necessary permissions to read secrets.
+
+#### Frontend Interaction
+
+The frontend application interacts with the API to retrieve the API key. When a user requests to retrieve the API key, the frontend sends an authenticated request to the API, which then retrieves the key from Kubernetes using the permissions granted by the RBAC configuration.
+
+This approach ensures that sensitive operations, like accessing API keys, are performed securely and only by authorized users, leveraging Kubernetes' robust RBAC system.
+
+
 ### Kubernetes Features
 
 The Kubernetes deployments are configured with several advanced features to ensure high availability, resilience, and optimal resource utilization:
