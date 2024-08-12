@@ -30,6 +30,9 @@ This solution employs a three-tier architecture that is meticulously designed to
 
 - **GitOps (Argo CD)**: Continuously monitors the Git repository for changes and automatically deploys updates to the Qdrant instances. Argo CD ensures that the desired state of the infrastructure, as defined in the Git repository, is maintained consistently across all environments.
 
+![ARGOCD](images/argocd.png)
+
+
 - **Link to Argo CD Configuration**: The apps (frontend and API) are configured in Argo CD, which ensures automated deployment and continuous integration.
   - [Argo CD App Configuration](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/applications/kustomize/argo.yaml)
 
