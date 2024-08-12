@@ -53,6 +53,30 @@ The deployment strategy leverages Kustomize and Argo CD to manage environment-sp
 - **Override and Kustomize Configuration**: The environment-specific settings and overrides are managed using Kustomize.
   - [Kustomize Overrides](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/applications/kustomize/overlays/prod/kustomization.yaml)
 
+
+### Managing Qdrant Helm Charts with Argo CD
+
+Argo CD is also used to manage the Helm charts for each client's Qdrant instance. The Helm charts are configured to deploy client-specific Qdrant instances with environment-specific values.
+
+We use this Helm chart for deploying each Qdrant instance:
+- [Qdrant Helm Chart](https://github.com/morettimaxi/qdrant-gitops/tree/master/argo-cd/clients/helm)
+
+Although we are using this Helm chart, it is possible to use a custom resource with the enterprise operator or any Helm configuration, as it works seamlessly with the GitOps approach. Each client has a dedicated `values.yaml` file to configure their specific instance. Here are examples of such configurations:
+
+- [Client 1 Values](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/clients/helm/client1/values.yaml)
+- [Client 2 Values](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/clients/helm/client2/values.yaml)
+
+These `values.yaml` files contain the necessary configurations for each client, such as resource limits, replica settings, and other deployment-specific parameters.
+
+Argo CD continuously monitors the Git repository for any changes to these `values.yaml` files. Once a change is detected, Argo CD automatically applies the updated configurations, ensuring that the Qdrant instances are always up-to-date with the desired state defined in the Git repository.
+
+For further details, refer to the Argo CD application configuration used to manage these deployments:
+- [Argo CD Client Configuration](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/clients.yaml)
+
+
+- **Override and Kustomize Configuration**: The environment-specific settings and overrides are managed using Kustomize.
+  - [Kustomize Overrides](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/applications/kustomize/overlays/prod/kustomization.yaml)
+
 ### Kubernetes Features
 
 The Kubernetes deployments are configured with several advanced features to ensure high availability, resilience, and optimal resource utilization:
