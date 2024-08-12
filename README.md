@@ -1,6 +1,3 @@
-# Full content of the README.md with all sections without using the problematic syntax
-
-full_readme_content = """
 # Qdrant GitOps SaaS DB Management PoC
 
 ## Introduction
