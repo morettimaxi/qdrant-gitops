@@ -13,6 +13,8 @@ This solution employs a three-tier architecture:
 - **API**: Acts as a middle layer, validating JWT tokens, processing client requests, and committing changes to a Git repository.
 - **GitOps (Argo CD)**: Automatically deploys and maintains Qdrant instances based on the changes committed to the Git repository.
 
+![Flow](images/qdraw-flow.png)
+
 ### JWT Configuration and Flow
 
 The JWT (JSON Web Token) is configured to include specific scopes for each client. Upon client login, the token is validated against the defined scopes, ensuring that each client can only manage their own Qdrant instance. If the token's scope matches the client, the API processes the request, such as configuring replicas, and commits the changes to the GitOps repository. Argo CD then takes over, deploying and maintaining the infrastructure automatically.
@@ -29,7 +31,6 @@ The JWT (JSON Web Token) is configured to include specific scopes for each clien
 5. **Argo CD Deployment**: Argo CD automatically deploys the changes, ensuring that the client's Qdrant instance is updated.
 
 ![JWT Flow](images/jwt-flow.png)
-
 
 
 
