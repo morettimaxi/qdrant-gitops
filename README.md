@@ -6,6 +6,9 @@ The objective of this repository is to create a SaaS Database Management Proof o
 
 ### How It Works
 
+![JWT Flow](images/qdraw-flow.png)
+
+
 This solution employs a three-tier architecture that is meticulously designed to ensure scalability, security, and automation:
 
 - **Frontend**: Provides a user-friendly interface where clients can log in, configure their Qdrant instances, and monitor status updates. The frontend is responsible for interacting with the user and securely transmitting data to the API.
