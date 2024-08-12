@@ -8,7 +8,7 @@ The objective of this repository is to create a SaaS Database Management Proof o
 Additionally, the solution includes two authentication mechanisms: JWT and OpenID. The frontend is configured to work with both methods, offering flexibility based on different authentication requirements.
 
 ## Click to see the full demo of JWT:
- - [JWT DEMO)](https://github.com/morettimaxi/qdrant-gitops/tree/master/source/client-frontend)
+ - [JWT DEMO)](https://github.com/morettimaxi/qdrant-gitops/blob/master/demo-jwt.md)
 
  ## Click to see the full demo of AUTH0 with openid oauth2:
  - [AUTH0 DEMO)](https://github.com/morettimaxi/qdrant-gitops/blob/master/demo-auth0.md)
