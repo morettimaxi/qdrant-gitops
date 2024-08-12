@@ -77,6 +77,57 @@ Argo CD continuously monitors the Git repository for any changes to these `value
 For further details, refer to the Argo CD application configuration used to manage these deployments:
 - [Argo CD Client Configuration](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/clients.yaml)
 
+# Auth0 OpenID Connect Integration with React and Node.js API
+
+This README provides an overview of how the Auth0 OpenID Connect (OIDC) integration works within the provided React application and how the Node.js API interacts with it. The setup allows users to log in via Auth0, and the application manages replicas and configurations securely.
+
+## Overview
+
+This solution utilizes Auth0 for user authentication and authorization using the OAuth2 and OpenID Connect protocols. The React application handles the user interface, while the API manages the backend operations.
+
+## How It Works
+
+1. **User Login**:
+   - The user initiates the login process by clicking the "Login with Auth0" button.
+   - Auth0 handles the authentication through OAuth2/OpenID Connect, returning an ID token and an access token if the login is successful.
+
+2. **ID Token**:
+   - The ID token contains user information, such as their nickname or name, which is then used in the React app.
+
+3. **Access Token**:
+   - The access token is retrieved from Auth0 and sent to the API for authorization.
+   - This access token is required to authenticate API requests, ensuring that only authorized users can interact with the API.
+
+4. **API Interaction**:
+   - When the user submits the form, the access token is sent along with the request to the API endpoint (`http://api.local/configure`).
+   - The API validates the access token by checking its signature, issuer, audience, and expiry.
+   - If the token is valid, the API processes the request (e.g., updating the replicas for the specified client).
+
+5. **OAuth2 and OpenID Connect**:
+   - OAuth2 is the underlying protocol that handles the authorization, while OpenID Connect adds an identity layer on top of OAuth2.
+   - OpenID Connect provides user authentication and a standard way to obtain user information via the ID token.
+
+## React Application Code
+
+The React application is responsible for handling user interactions, including logging in and configuring replicas. Below is a reference to the code where the Auth0 integration is implemented:
+
+- [React Auth0 Integration Code](https://github.com/morettimaxi/qdrant-gitops/blob/1a8c34b2f4686503dbf049522375c4fca0d0e355/source/client-frontend-auth/src/index.js#L10)
+
+## API Integration
+
+The API validates the access token provided by the React application. Once validated, the API processes the request based on the client's configuration and updates the necessary settings.
+
+## Security
+
+This implementation leverages OAuth2 and OpenID Connect through Auth0 to ensure secure authentication and authorization. The access token allows the API to verify the identity of the requester, ensuring that only authorized users can perform specific actions.
+
+## Diagram
+
+Refer to the diagram (attached separately) that visually represents the interaction between the React application, Auth0, and the API.
+
+![Auth0 Flow](images/auth0-flow.png)
+
+
 ### Kubernetes Features
 
 The Kubernetes deployments are configured with several advanced features to ensure high availability, resilience, and optimal resource utilization:
