@@ -82,7 +82,7 @@ Argo CD continuously monitors the Git repository for any changes to these `value
 For further details, refer to the Argo CD application configuration used to manage these deployments:
 - [Argo CD Client Configuration](https://github.com/morettimaxi/qdrant-gitops/blob/master/argo-cd/clients.yaml)
 
-# Auth0 OpenID Connect Integration with React and Node.js API
+## Auth0 OpenID Connect Integration with React and Node.js API
 
 This README provides an overview of how the Auth0 OpenID Connect (OIDC) integration works within the provided React application and how the Node.js API interacts with it. The setup allows users to log in via Auth0, and the application manages replicas and configurations securely.
 
@@ -182,7 +182,7 @@ app.get('/token/:client', authenticateToken, async (req, res) => {
 
 The API requires specific permissions to access secrets in Kubernetes. This is achieved through RBAC (Role-Based Access Control) settings:
 
-\`\`\`yaml
+'''yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -210,7 +210,7 @@ roleRef:
   kind: ClusterRole
   name: api-read-secrets-cluster-role
   apiGroup: rbac.authorization.k8s.io
-\`\`\`
+'''
 
 **Explanation**:
 - **ServiceAccount**: The `api-service-account` is created in the `saas-app` namespace. This service account is used by the API to interact with Kubernetes.
