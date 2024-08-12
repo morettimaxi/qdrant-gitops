@@ -142,38 +142,8 @@ The application uses Kubernetes Role-Based Access Control (RBAC) permissions to 
 
 #### How the API Retrieves Secrets
 
-The API includes an endpoint `GET /token/:client` which allows authorized users to retrieve the API key for a specific Qdrant client. Here's a breakdown of how it works:
+The API includes an endpoint `GET /token/:client` which allows authorized users to retrieve the API key for a specific Qdrant client. 
 
-\`\`\`javascript
-app.get('/token/:client', authenticateToken, async (req, res) => {
-    const { client } = req.params;
-
-    if (req.user.scope !== client && req.user.scope !== 'admin') {
-        return res.status(403).json({ error: 'Insufficient permissions' });
-    }
-
-    try {
-        const secretName = `qdrant-${client}-apikey`;
-        const namespace = `qdrant-${client}`;
-
-        // Fetch the secret from Kubernetes
-        const secret = await k8sApi.readNamespacedSecret(secretName, namespace);
-
-        // Check if the api-key field exists in the secret's data
-        if (!secret.body.data || !secret.body.data['api-key']) {
-            return res.status(500).send({ error: 'API key not found in secret' });
-        }
-
-        // Decode the api-key from base64
-        const apiKey = Buffer.from(secret.body.data['api-key'], 'base64').toString();
-
-        res.send({ token: apiKey });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ error: 'Failed to retrieve token' });
-    }
-});
-\`\`\`
 
 **Explanation**:
 - The API first checks if the user has the necessary permissions (i.e., their `scope` matches the `client` or they are an admin).
@@ -182,6 +152,7 @@ app.get('/token/:client', authenticateToken, async (req, res) => {
 - The API key is decoded from base64 and returned to the user.
 
 #### Kubernetes RBAC Configuration
+![rbac Flow](images/rbac.png)
 
 The API requires specific permissions to access secrets in Kubernetes. This is achieved through RBAC (Role-Based Access Control) settings:
 
