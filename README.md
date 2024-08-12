@@ -10,6 +10,9 @@ Additionally, the solution includes two authentication mechanisms: JWT and OpenI
 ## Click to see the full demo of JWT:
  - [JWT DEMO)](https://github.com/morettimaxi/qdrant-gitops/tree/master/source/client-frontend)
 
+ ## Click to see the full demo of AUTH0 with openid oauth2:
+ - [AUTH0 DEMO)](https://github.com/morettimaxi/qdrant-gitops/blob/master/demo-auth0.md)
+
 
 
 ### How It Works
