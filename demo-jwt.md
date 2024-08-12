@@ -1,90 +1,114 @@
-Go to http://frontend.local/
+
+# Using JWT Authentication with the Frontend and API
+
+Follow the steps below to authenticate, configure, and interact with the Qdrant Helm chart using JWT authentication.
+
+### Step 1: Login
+
+Go to [http://frontend.local/](http://frontend.local/)
 
 Login using the following credentials:
 
-![JWT Flow](images/jwt-1.png)
+- **Username**: client1
+- **Password**: client1
 
+Or
 
-- Username: client1
-- Password: client1
+- **Username**: client2
+- **Password**: client2
 
-or
-- Username: client2
-- Password: client2
+![Login Screen](images/jwt-1.png)
 
-The frontend make a post to this endpoint: http://api.local/logi
+### Step 2: API Login Request
 
-code:
-curl 'http://api.local/login' \
-  -H 'Referer: http://frontend.local/' \
-  --data-raw '{"username":"client1","password":"client1"}' \
-  --insecure
+The frontend sends a POST request to the following endpoint:
+
+\`\`\`bash
+curl 'http://api.local/login'   -H 'Referer: http://frontend.local/'   --data-raw '{"username":"client1","password":"client1"}'   --insecure
+\`\`\`
 
 The API will return a JWT token that will be stored in the local storage of the browser.
 
-![JWT Flow](images/jwt-2.png)
+![JWT Token](images/jwt-2.png)
 
+### Step 3: Decode the JWT Token
 
-If we decode the token we can see the following information:
+If we decode the token, we can see the following information:
 
-![JWT Flow](images/jwt-3.png)
+![Decoded Token](images/jwt-3.png)
 
-The payflow has the scope for the client 1 so this user only could modify this client.
+The payload contains the scope for the client1 user, so this user can only modify settings for client1.
 
-The token has a Verify signatre encrypted, only the API could decrypt this token. THe siging is in this code
+### Step 4: JWT Token Signature
 
+The token has a verified signature that is encrypted. Only the API can decrypt this token. The signing is handled in the following code:
+
+\`\`\`javascript
 const token = jwt.sign({ username, scope: users[username].scope }, SECRET_KEY, { expiresIn: '1h' });
+\`\`\`
 
-https://github.com/morettimaxi/qdrant-gitops/blob/463990308973e902cbaeb0000132bbb4a5b46e63/source/api/index.js#L43
+[View the Code](https://github.com/morettimaxi/qdrant-gitops/blob/463990308973e902cbaeb0000132bbb4a5b46e63/source/api/index.js#L43)
 
-//TO Do: The secret key is hardcoded, we need to change this to a secret manager like Vault or AWS Secret Manager to store the secret key. For taht we need a process to the rotation, and the secret key should be stored in a secure place.
+**Note**: The secret key is currently hardcoded. This should be changed to a secret manager like Vault or AWS Secret Manager for storing the secret key. Additionally, a process for rotation should be implemented, and the secret key should be stored in a secure place.
 
-Now we made te login with the client1 user. It only can see the client1 information.
+### Step 5: Modify Qdrant Helm Chart
 
-![JWT Flow](images/jwt-4.png)
+After logging in with the client1 user, you can see the client1 information.
 
-We will modify the number of replcias of the Qdrant Helm chart to 3 replicas..
+![Client Information](images/jwt-4.png)
 
-![JWT Flow](images/jwt-5.png)
+We will modify the number of replicas for the Qdrant Helm chart to 3 replicas.
 
-It make a post to the API, it inhect the jwt token in the header.
+![Modify Replicas](images/jwt-5.png)
 
-curl 'http://api.local/configure' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
-  --data-raw '{"client":"client1","replicas":"3"}' \
-  --insecure
+The frontend makes a POST request to the API, injecting the JWT token in the header:
 
-  The API will validate if the user has the scope to modify the client1 and if the client exists. For that it will decode using the secret the token and check the scope and the client.
+\`\`\`bash
+curl 'http://api.local/configure'   -H 'Authorization: Bearer <JWT_TOKEN>'   --data-raw '{"client":"client1","replicas":"3"}'   --insecure
+\`\`\`
 
-  We get the response from the API that the replicas are updated and pushed to Github
-  ![JWT Flow](images/jwt-6.png)
+### Step 6: API Validation
 
-  The APi automatially make a commit to the git repository with the new configuration.
+The API will validate if the user has the scope to modify client1 and if the client exists. It will decode the token using the secret and check the scope and client.
 
-    ![JWT Flow](images/jwt-7.png)
-Commit: https://github.com/morettimaxi/qdrant-gitops/commit/e19471207607d499adc37b9f827bb35490cfa5bb
+We get a response from the API that the replicas are updated and pushed to GitHub.
 
-Argo CD detected the chaange and it will apply the new configuration to the cluster.
+![API Response](images/jwt-6.png)
 
-![JWT Flow](images/jwt-8.png)
+The API automatically makes a commit to the Git repository with the new configuration.
 
-Argo Event: 
-![JWT Flow](images/jwt-0.png)
+![Git Commit](images/jwt-7.png)
 
+[View the Commit](https://github.com/morettimaxi/qdrant-gitops/commit/e19471207607d499adc37b9f827bb35490cfa5bb)
 
-Also it has the featuure to get the API key and endpoint to connect to the Qdrant API.
+### Step 7: Argo CD Deployment
 
-![JWT Flow](images/jwt-10.png)
+Argo CD detects the change and applies the new configuration to the cluster.
 
-curl 'http://api.local/token/client1' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNsaWVudDEiLCJzY29wZSI6ImNsaWVudDEiLCJpYXQiOjE3MjM0MjcwODUsImV4cCI6MTcyMzQzMDY4NX0.hPF0XX7xm-_s-49M9PdFznYkEM7Mq3J-hJ1e3dovgCo' \
- 
- The frontend make this query to the API to get the API key and the endpoint to connect to the Qdrant API and show the URL and API key to the user.
+![Argo CD Deployment](images/jwt-8.png)
 
-![JWT Flow](images/jwt-11.png)
+### Step 8: Retrieve the API Key and Endpoint
 
-If we make the same query but for the client2 user, it will return an error because the user doesn't have the scope to modify the client1.
+The API also has the feature to retrieve the API key and endpoint to connect to the Qdrant API.
 
-``` curl 'http://api.local/token/client2'   -H 'Accept: */*'   -H 'Accept-Language: en'   -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNsaWVudDEiLCJzY29wZSI6ImNsaWVudDEiLCJpYXQiOjE3MjM0MjcwODUsImV4cCI6MTcyMzQzMDY4NX0.hPF0XX7xm-_s-49M9PdFznYkEM7Mq3J-hJ1e3dovgCo'   -H 'Cache-Control: no-cache'   -H 'Connection: keep-alive'   -H 'DNT: 1'   -H 'Origin: http://localhost:3000'   -H 'Pragma: no-cache'   -H 'Referer: http://localhost:3000/'   -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'   --insecure
-{"error":"Insufficient permissions"}```
+![API Key Retrieval](images/jwt-10.png)
 
+\`\`\`bash
+curl 'http://api.local/token/client1'   -H 'Authorization: Bearer <JWT_TOKEN>'   --insecure
+\`\`\`
+
+The frontend makes this query to the API to get the API key and the endpoint to connect to the Qdrant API and displays the URL and API key to the user.
+
+![API Key Display](images/jwt-11.png)
+
+### Step 9: Insufficient Permissions Example
+
+If we make the same query but with the client2 user, it will return an error because the user does not have the scope to modify client1.
+
+\`\`\`bash
+curl 'http://api.local/token/client2'   -H 'Authorization: Bearer <JWT_TOKEN>'   --insecure
+\`\`\`
+
+\`\`\`json
+{"error":"Insufficient permissions"}
+\`\`\`
